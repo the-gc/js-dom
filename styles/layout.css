@@ -80,3 +80,21 @@ article img{
 	display: block;
 	overflow: hidden;
 }
+td {
+	padding: .5em 3em;
+}
+dl{
+	overflow: hidden;
+}
+dt{
+	float: left;
+}
+dd{
+	float: left;
+}
+label{
+	display: block;
+}
+fieldset{
+	border: 0;
+}

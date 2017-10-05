@@ -20,7 +20,7 @@ function insertAfter(newElement, targetElement) {
 	}
 }
 
-function addClass(elment,value) {
+function addClass(element,value) {
 	if (!element.className){          //检查classname属性是否为null
 		element.className = value;    //如果是，将新的class设置值直接赋给classname属性
 	} else{                           //如果不是，把一个空格新的class设置值追加到classname属性上去
@@ -200,6 +200,39 @@ function prepareInternalnav() {
 }
 
 //photos.html
+
+
+function preparePlaceholder() {
+	if (!document.createElement) return false;
+	if (!document.createTextNode) return false;
+	if (!document.getElementById) return false;
+	if (!document.getElementById("imagegallery")) return false;
+	var placeholder = document.createElement("img");
+	placeholder.setAttribute("id","placeholder");
+	placeholder.setAttribute("alt","my image gallery");
+	placeholder.setAttribute("src","images/placeholder.jpg");
+	var description = document.createElement("p");
+	description.setAttribute("id","description");
+	var desctext = document.createTextNode("choose an image");
+	description.appendChild(desctext);
+	var gallery = document.getElementById("imagegallery");
+	insertAfter(description,gallery);
+	insertAfter(placeholder,description);
+
+}
+
+function prepareGallery() {
+	if (!document.getElementsByTagName) return false;
+	if (!document.getElementById) return false;
+	if (!document.getElementById("imagegallery")) return false;
+	var gallery = document.getElementById("imagegallery");
+	var links = gallery.getElementsByTagName("a");
+	for (var i=0; i<links.length; i++){
+		links[i].onclick = function() {
+			return showPic(this);
+		}
+	}
+}
 function showPic(whichpic) {
 	if (!document.getElementById("placeholder")) return false;
 	var source = whichpic.getAttribute("href");
@@ -211,21 +244,245 @@ function showPic(whichpic) {
 	} else{
 		var text = "";
 	}
-	var description = document.getElementById("description");
-	if (description.fristChild.nodeType == 3){
-		description.fristChild.nodeValue = text;
-	}
+	//var description = document.getElementById("description");
+	// //[Web浏览器] "Uncaught TypeError: Cannot read property 'nodeType' of undefined"	
+	// ///jsDom/demo1/scripts/global.js (235)
+	// if (description.fristChild.nodeType == 3){
+	// description.fristChild.nodeValue = text;
+	// }
 	return false;
 
 }
 
-function preparePlaceholder() {
-	if (!document.createElement) return false;
-	if (!document.createTextNode) return false;
-	if (!document.getElementById)
-
+//live.html
+function stripeTables() {
+	if (!document.getElementsByTagName) return false;
+	var tables = document.getElementsByTagName("table");
+	for (var i=0; i<tables.length; i++){
+		var odd = false;
+		var rows = tables[i].getElementsByTagName("tr");
+		for (var j=0; j<rows.length; j++){
+			if (odd == true){
+				addClass(rows[j], "odd");
+				odd = false;
+			} else{
+				odd = true;
+			}
+		}
+	}
 }
+ function highlightRows() {
+ 	if (!document.getElementsByTagName) return false;
+ 	var rows = document.getElementsByTagName("tr");
+ 	for (var i=0; i<length; i++){
+ 		rows[i].oldClassName = rows[i].className;
+ 		rows[i].onmouseover = function() {
+ 			addClass(this,"hightlight");
+ 		}
+ 		rows[i].onmouseout = function() {
+ 			this.className = this.oldClassName;
+ 		}
+ 	}
+ }
+ function displayAbbreviations() {
+ 	if (!document.getElementsByTagName || !document.createElement 
+ 		|| !document.createTextNode) return false;
+ 	var abbreviations = document.getElementsByTagName("abbr");
+ 	if (abbreviations.length < 1) return false;
+ 	var defs = new Array();
+ 	for (var i=0; i<abbreviations.length; i++){
+ 		var current_abbr = abbreviations[i];
+ 		if (current_abbr.childNodes.length < 1) continue;
+ 		var definition = current_abbr.getAttribute("title");
+ 		var key = current_abbr.lastChild.nodeValue;
+ 		defs[key] = definition;
+ 	}
+ 	var dlist = document.createElement("dl");
+ 	for (key in defs){
+ 		var definition = defs[key];
+ 		var dtitle = document.createElement("dt");
+ 		var dtitle_text = document.createTextNode(key);
+ 		dtitle.appendChild(dtitle_text);
+ 		var ddesc = document.createElement("dd");
+ 		var ddesc_text = document.createTextNode(definition);
+ 		ddesc.appendChild(ddesc_text);
+ 		dlist.appendChild(dtitle);
+ 		dlist.appendChild(ddesc);
+ 	}
+ 	if (dlist.childNodes.length < 1) return false;
+ 	var header = document.createElement("h3");
+ 	var header_text = document.createTextNode("abbreviations");
+ 	header.appendChild(header_text);
+ 	var articles = document.getElementsByTagName("article");
+ 	if (articles.length == 0) return false;
+ 	var container = articles[0];
+ 	container.appendChild(header);
+ 	container.appendChild(dlist);
+ }
+
+ //contact.html
+ function focusLabels() {
+ 	if (!document.getElementsByTagName) return false;
+ 	var labels = document.getElementsByTagName("label");
+ 	for (var i=0; i<labels.length; i++){
+ 		if (!labels[i].getAttribute("for")) continue;
+ 		labels[i].onclick = function() {
+ 			var id = this.getAttribute("for");
+ 			if (!document.getElementById(id)) return false;
+ 			var element = document.getElementById(id);
+ 			element.focus();
+ 		}
+ 	} 
+ }
+//
+//缺少表单验证函数
+//
+//
+//浏览器不支持placeholder
+ function resetFields(whichform) {
+ 	if (Modernizr.input.placeholder) return;
+ 	for (var i=0; i<whichform.elements.length; i++){
+ 		var element = whichform.elements[i];
+ 		if (element.type == "submit") continue;
+ 		var check = element.placeholder || element.getAttribute("placeholder");
+ 		if (!check) continue;
+ 		element.onfocus = function() {
+ 			var text = this.placeholder || this.getAttribute("placeholder");
+ 			if (this.value == text){
+ 				this.className = '';
+ 				this.value = "";
+ 			}
+ 		}
+ 		element.onblur = function() {
+ 			if (this.value == ""){
+ 				this.className = "placeholder";
+ 				this.value = this.placeholder || this.getAttribute('placeholder');
+ 			}
+ 		}
+
+ 		element.onblur();
+ 	}
+ }
+ // function prepareForms() {
+ // 	for (var i=0; i<document.forms.length; i++){
+ // 		var thisform = document.forms[i];
+ // 		resetFields(thisform);
+ // 	}
+ // }
+
+ //验证表单
+ function isFiled(filed) {
+ 	if (filed.value.replace(' ','').length == 0) return false;
+ 	var placeholder = filed.placeholder || filed.getAttribute('placeholder');
+ 	return (filed.value != placeholder);
+ }
+ //验证email
+ //首先查找字符@，接着搜索句点".";
+ function isEmail(filed) {
+ 	return (filed.value.indexOf("@") != -1 && filed.value.indexOf(".") != -1);
+ }
+
+ function validateForm(whichform) {
+ 	for (var i=0; i<whichform.elements.length; i++){
+ 		var element = whichform.elements[i];
+ 		if (element.required == 'required') {
+ 			if (!isFiled(element)) {
+ 				alert("Please fill in the" +element.name+ "filed.");
+ 				return false;
+ 			}
+ 		}
+ 		if (element.type == 'email'){
+ 			if (!isEmail(element)){
+ 				alert("the " +element.name+ " filed must be a valid email address.");
+ 				return false;
+ 			}
+ 		}
+ 	}
+ 	return true;
+ }
+ //提交表单，会触发submit事件，而事件会被onsubmit事件处理函数拦截。处理函数时，会将表单传递给validateForm函数
+ 
+function prepareForms(){
+    for(var i=0;i< document.forms.length;i++){
+        var thisform = document.forms[i];
+        resetFields(thisform);
+        thisform.onsubmit = function(){
+            if(!validateForm(this)) return false;
+            var article = document.getElementsByTagName('article')[0];
+            if(submitFormWithAjax(this,article)) return false;
+            return true;
+        }
+    }
+}
+
+//提交表单
+function getHTTPObject() {
+	if (typeof XMLHttpRequest == "undefind")
+		XMLHttpRequest = function() {
+			try{ return new ActiveXObject("Msxml2.XMLHTTP.6.0"); }
+				catch (e) {}
+			try{ return new ActiveXObject("Msxml2.XMLHTTP.3.0"); }
+			    catch (e) {}
+			try{ return new ActiveXObject("Msxml2.XMLHTTP"); }
+			    catch (e) {}
+			    return false;
+		}
+		return new XMLHttpRequest();
+}
+function displayAjaxLoading(element) {
+	while (element.hasChildNodes()){
+		element.removeChild(element.lastChild);
+	}
+	var content = document.createElement("img");
+	content.setAttribute("src","images/loading.gif");
+	content.setAttribute("alt","Loading...");
+	element.appendChild(content);
+}
+function submitFormWithAjax(whichform, thetarget){
+	var request = getHTTPObject();
+	if (!request) {
+		return false;
+	}
+	displayAjaxLoading(thetarget);
+	var dataParts = [];
+	var element;
+	for (var i=0; i<whichform.elements.length; i++){
+		element = whichform.elements[i];
+		dataParts[i] = element.name + '=' + encodeURIComponent(element.value);
+	}
+	var data = dataParts.join('&');
+	request.open("POST", whichform.getAttribute("action"), true);
+	request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	request.onreadystatechange = function() {
+		if (request.readyState == 4){
+			if (request.status == 200 || request.status == 0){
+				var matches = request.responseText.match(/<article>([\s\S]+)<\/article>/);
+				if (match.length > 0){
+					thetarget.innerHTML = matches[1];
+				} else{
+					thetarget.innerHTML = '<p>Oops, there was an error. Soory.</p>';
+				}
+
+			} else{
+				thetarget.innerHTML = '<p>' + request.statusText + '</p>';
+			}
+		}
+
+	};
+	request.send(data);
+	return true;
+
+};//为什么加分号
 
 addLoadEvent(prepareSlideshow);
 addLoadEvent(highlightPage);
 addLoadEvent(prepareInternalnav);
+addLoadEvent(preparePlaceholder);
+addLoadEvent(prepareGallery);
+addLoadEvent(stripeTables);
+addLoadEvent(highlightRows);
+addLoadEvent(displayAbbreviations);
+addLoadEvent(focusLabels);
+addLoadEvent(prepareForms);
+
+
